@@ -68,51 +68,51 @@ Execute-WithRetry{
             $securePassword = ConvertTo-SecureString $OctopusAzureADPassword -AsPlainText -Force
             $creds = New-Object System.Management.Automation.PSCredential ($OctopusAzureADClientId, $securePassword)
             
-            if (Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue)
-            {
-                # Turn off context autosave, as this will make all authentication occur in memory, and isolate each session from the context changes in other sessions
-                Disable-AzureRMContextAutosave -Scope Process
+            # if (Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue)
+            # {
+            #     # Turn off context autosave, as this will make all authentication occur in memory, and isolate each session from the context changes in other sessions
+            #     Disable-AzureRMContextAutosave -Scope Process
 
-                $AzureEnvironment = Get-AzureRmEnvironment -Name $OctopusAzureEnvironment
-                if (!$AzureEnvironment)
-                {
-                    Write-Error "No Azure environment could be matched given the name $OctopusAzureEnvironment"
-                    exit -2
-                }
+            #     $AzureEnvironment = Get-AzureRmEnvironment -Name $OctopusAzureEnvironment
+            #     if (!$AzureEnvironment)
+            #     {
+            #         Write-Error "No Azure environment could be matched given the name $OctopusAzureEnvironment"
+            #         exit -2
+            #     }
 
-                Write-Verbose "AzureRM Modules: Authenticating with Service Principal"
+            #     Write-Verbose "AzureRM Modules: Authenticating with Service Principal"
 
-                # Force any output generated to be verbose in Octopus logs.
-                Write-Host "##octopus[stdout-verbose]"
-                Login-AzureRmAccount -Credential $creds -TenantId $OctopusAzureADTenantId -SubscriptionId $OctopusAzureSubscriptionId -Environment $AzureEnvironment -ServicePrincipal
-                Write-Host "##octopus[stdout-default]"
-            }
-            elseif (Get-InstalledModule Az -ErrorAction SilentlyContinue)
-            {
-                if (-Not(Get-Command "Disable-AzureRMContextAutosave" -errorAction SilentlyContinue))
-                {
-                    # Turn on AzureRm aliasing
-                    # See https://docs.microsoft.com/en-us/powershell/azure/migrate-from-azurerm-to-az?view=azps-3.0.0#enable-azurerm-compatibility-aliases
-                    Enable-AzureRmAlias -Scope Process
-                }
+            #     # Force any output generated to be verbose in Octopus logs.
+            #     Write-Host "##octopus[stdout-verbose]"
+            #     Login-AzureRmAccount -Credential $creds -TenantId $OctopusAzureADTenantId -SubscriptionId $OctopusAzureSubscriptionId -Environment $AzureEnvironment -ServicePrincipal
+            #     Write-Host "##octopus[stdout-default]"
+            # }
+            # elseif (Get-InstalledModule Az -ErrorAction SilentlyContinue)
+            # {
+            #     if (-Not(Get-Command "Disable-AzureRMContextAutosave" -errorAction SilentlyContinue))
+            #     {
+            #         # Turn on AzureRm aliasing
+            #         # See https://docs.microsoft.com/en-us/powershell/azure/migrate-from-azurerm-to-az?view=azps-3.0.0#enable-azurerm-compatibility-aliases
+            #         Enable-AzureRmAlias -Scope Process
+            #     }
 
-                # Turn off context autosave, as this will make all authentication occur in memory, and isolate each session from the context changes in other sessions
-                Disable-AzContextAutosave -Scope Process
+            #     # Turn off context autosave, as this will make all authentication occur in memory, and isolate each session from the context changes in other sessions
+            #     Disable-AzContextAutosave -Scope Process
 
-                $AzureEnvironment = Get-AzEnvironment -Name $OctopusAzureEnvironment
-                if (!$AzureEnvironment)
-                {
-                    Write-Error "No Azure environment could be matched given the name $OctopusAzureEnvironment"
-                    exit -2
-                }
+            #     $AzureEnvironment = Get-AzEnvironment -Name $OctopusAzureEnvironment
+            #     if (!$AzureEnvironment)
+            #     {
+            #         Write-Error "No Azure environment could be matched given the name $OctopusAzureEnvironment"
+            #         exit -2
+            #     }
 
-                Write-Verbose "Az Modules: Authenticating with Service Principal"
+            #     Write-Verbose "Az Modules: Authenticating with Service Principal"
 
-                # Force any output generated to be verbose in Octopus logs.
-                Write-Host "##octopus[stdout-verbose]"
-                Connect-AzAccount -Credential $creds -TenantId $OctopusAzureADTenantId -SubscriptionId $OctopusAzureSubscriptionId -Environment $AzureEnvironment -ServicePrincipal
-                Write-Host "##octopus[stdout-default]"
-            }
+            #     # Force any output generated to be verbose in Octopus logs.
+            #     Write-Host "##octopus[stdout-verbose]"
+            #     Connect-AzAccount -Credential $creds -TenantId $OctopusAzureADTenantId -SubscriptionId $OctopusAzureSubscriptionId -Environment $AzureEnvironment -ServicePrincipal
+            #     Write-Host "##octopus[stdout-default]"
+            # }
             
             If (!$OctopusDisableAzureCLI -or $OctopusDisableAzureCLI -like [Boolean]::FalseString) {
                 try {
