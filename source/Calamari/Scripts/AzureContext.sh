@@ -40,10 +40,10 @@ function setup_context {
 
         echo "Azure CLI: Authenticating with Service Principal"
         loginArgs=()
-        loginArgs+=("-u $Octopus_Azure_ADClientId")
         # Use the full argument because of https://github.com/Azure/azure-cli/issues/12105
-        loginArgs+=("--password $Octopus_Azure_ADPassword")
-        loginArgs+=("--tenant $Octopus_Azure_ADTenantId")
+        loginArgs+=("--username=$Octopus_Azure_ADClientId")        
+        loginArgs+=("--password=$Octopus_Azure_ADPassword")
+        loginArgs+=("--tenant=$Octopus_Azure_ADTenantId")
         echo az login --service-principal ${loginArgs[@]}
         az login --service-principal ${loginArgs[@]}
 
