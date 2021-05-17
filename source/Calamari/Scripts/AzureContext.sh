@@ -46,6 +46,8 @@ function setup_context {
         loginArgs+=("--tenant=$Octopus_Azure_ADTenantId")
         echo az login --service-principal ${loginArgs[@]}
         # Note: Need to double quote the loginArgs here to ensure that spaces aren't treated as separate arguments
+        #       It also seems like putting double quotes around each individual argument makes az cli include the "
+        #       character as part of the input causing issues...
         az login --service-principal "${loginArgs[@]}"
 
         echo "Azure CLI: Setting active subscription to $Octopus_Azure_SubscriptionId"
