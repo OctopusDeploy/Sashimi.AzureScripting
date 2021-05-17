@@ -45,7 +45,8 @@ function setup_context {
         loginArgs+=("--password=$Octopus_Azure_ADPassword")
         loginArgs+=("--tenant=$Octopus_Azure_ADTenantId")
         echo az login --service-principal ${loginArgs[@]}
-        az login --service-principal ${loginArgs[@]}
+        # Note: Need to double quote the loginArgs here to ensure that spaces aren't treated as separate arguments
+        az login --service-principal "${loginArgs[@]}"
 
         echo "Azure CLI: Setting active subscription to $Octopus_Azure_SubscriptionId"
         az account set --subscription $Octopus_Azure_SubscriptionId
