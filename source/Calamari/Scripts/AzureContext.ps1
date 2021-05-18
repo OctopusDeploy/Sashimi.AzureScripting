@@ -68,12 +68,12 @@ Execute-WithRetry{
             $securePassword = ConvertTo-SecureString $OctopusAzureADPassword -AsPlainText -Force
             $creds = New-Object System.Management.Automation.PSCredential ($OctopusAzureADClientId, $securePassword)
 
-            Get-InstalledModule
+            Get-Alias
 
             $useAzureRmModule = Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue
             $runningInPowershellCore = $PSVersionTable.PSVersion.Major -gt 5
 
-            if ($useAzureRmModule -eq $true -and $runningInPowershellCore -eq $true)
+            if ($useAzureRmModule-and $runningInPowershellCore)
             {
                 # AzureRM is not supported on powershell core, skip over this authentication method and warn of this
                 Write-Warning "AzureRM module is not compatible with Powershell Core, authentication will not be performed with AzureRM"
@@ -101,7 +101,7 @@ Execute-WithRetry{
             }
             elseif (Get-InstalledModule Az -ErrorAction SilentlyContinue)
             {
-                if (-Not(Get-Command "Disable-AzureRMContextAutosave" -errorAction SilentlyContinue))
+                if (-Not(Get-Command "Disable-AzureRMContextAutosave" -errorAction SilentlyContinue) -and !$runningInPowershellCore)
                 {
                     Write-Verbose "Enabling AzureRM aliasing"
 
