@@ -68,7 +68,10 @@ Execute-WithRetry{
             $securePassword = ConvertTo-SecureString $OctopusAzureADPassword -AsPlainText -Force
             $creds = New-Object System.Management.Automation.PSCredential ($OctopusAzureADClientId, $securePassword)
 
-            $runningInPowershellCore = $PSVersionTable.PSVersion.Major -gt 5         
+            $azureRmPresent = (Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue)
+            $azPresent = (Get-InstalledModule Az -ErrorAction SilentlyContinue)
+            $runningInPowershellCore = $PSVersionTable.PSVersion.Major -gt 5
+            Write-Host "runningInPowershellCore: $runningInPowershellCore, azureRmPresent: $azureRmPresent, azPresent: $azPresent"
             
             if ($runningInPowershellCore -and (Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue))
             {
