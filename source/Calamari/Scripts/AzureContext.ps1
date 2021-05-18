@@ -67,11 +67,18 @@ Execute-WithRetry{
             # Authenticate via Service Principal
             $securePassword = ConvertTo-SecureString $OctopusAzureADPassword -AsPlainText -Force
             $creds = New-Object System.Management.Automation.PSCredential ($OctopusAzureADClientId, $securePassword)
+
+            $useAzureRmModule = Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue
+            $runningInPowershellCore = $PSVersionTable.PSVersion.Major -gt 5
+
+            if ($useAzureRmModule -And $runningInPowershellCore)
+            {
+                # AzureRM is not supported on powershell core, skip over this authentication method and warn of this
+                Write-Warning "AzureRM module is not compatible with Powershell Core, authentication will not be performed with AzureRM"
+                $useAzureRmModule = $false
+            }            
             
-            $runningInPowershellCore = $PSVersionTable.PSVersion.Major -gt 5            
-            
-            # AzureRM is not supported on powershell core, skip over this authentication method
-            if ((Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue) -And ($runningInPowershellCore -eq $false))
+            if ($useAzureRmModule)
             {
                 # Turn off context autosave, as this will make all authentication occur in memory, and isolate each session from the context changes in other sessions
                 Disable-AzureRMContextAutosave -Scope Process
