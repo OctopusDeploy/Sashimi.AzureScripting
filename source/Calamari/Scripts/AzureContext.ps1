@@ -70,17 +70,17 @@ Execute-WithRetry{
 
             Get-Alias
 
-            $useAzureRmModule = Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue
+            #$useAzureRmModule = 
             $runningInPowershellCore = $PSVersionTable.PSVersion.Major -gt 5
 
-            if ($useAzureRmModule-and $runningInPowershellCore)
-            {
-                # AzureRM is not supported on powershell core, skip over this authentication method and warn of this
-                Write-Warning "AzureRM module is not compatible with Powershell Core, authentication will not be performed with AzureRM"
-                $useAzureRmModule = $false
-            }            
+            # if ($runningInPowershellCore -and (Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue))
+            # {
+            #     # AzureRM is not supported on powershell core, skip over this authentication method and warn of this
+            #     Write-Warning "AzureRM module is not compatible with Powershell Core, authentication will not be performed with AzureRM"
+            #     $useAzureRmModule = $false
+            # }            
             
-            if ($useAzureRmModule)
+            if (!$runningInPowershellCore -and (Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue))
             {
                 # Turn off context autosave, as this will make all authentication occur in memory, and isolate each session from the context changes in other sessions
                 Disable-AzureRMContextAutosave -Scope Process
@@ -101,7 +101,7 @@ Execute-WithRetry{
             }
             elseif (Get-InstalledModule Az -ErrorAction SilentlyContinue)
             {
-                if (-Not(Get-Command "Disable-AzureRMContextAutosave" -errorAction SilentlyContinue) -and !$runningInPowershellCore)
+                if (!$runningInPowershellCore -and -Not(Get-Command "Disable-AzureRMContextAutosave" -errorAction SilentlyContinue))
                 {
                     Write-Verbose "Enabling AzureRM aliasing"
 
