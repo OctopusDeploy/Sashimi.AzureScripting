@@ -68,10 +68,12 @@ Execute-WithRetry{
             $securePassword = ConvertTo-SecureString $OctopusAzureADPassword -AsPlainText -Force
             $creds = New-Object System.Management.Automation.PSCredential ($OctopusAzureADClientId, $securePassword)
 
+            Get-InstalledModule
+
             $useAzureRmModule = Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue
             $runningInPowershellCore = $PSVersionTable.PSVersion.Major -gt 5
 
-            if ($useAzureRmModule -And $runningInPowershellCore)
+            if ($useAzureRmModule -eq $true -and $runningInPowershellCore -eq $true)
             {
                 # AzureRM is not supported on powershell core, skip over this authentication method and warn of this
                 Write-Warning "AzureRM module is not compatible with Powershell Core, authentication will not be performed with AzureRM"
