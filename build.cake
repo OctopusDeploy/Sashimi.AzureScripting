@@ -80,20 +80,20 @@ Task("Build")
     });
 });
 
-// Task("Test")
-//     .IsDependentOn("Build")
-//     .WithCriteria(BuildSystem.IsLocalBuild)
-//     .Does(() => {
-// 		var projects = GetFiles("./source/**/*Tests.csproj");
+Task("Test")
+    .IsDependentOn("Build")
+    .WithCriteria(BuildSystem.IsLocalBuild)
+    .Does(() => {
+		var projects = GetFiles("./source/**/*Tests.csproj");
 
-//         Parallel.ForEach(projects, project => {
-//             DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
-// 			{
-// 				Configuration = configuration,
-// 				NoBuild = true
-// 			});
-//         });
-//     });
+        Parallel.ForEach(projects, project => {
+            DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
+			{
+				Configuration = configuration,
+				NoBuild = true
+			});
+        });
+    });
 
 Task("PublishCalamariProjects")
    .IsDependentOn("Build")
@@ -175,7 +175,7 @@ Task("PackSashimi")
 });
 
 Task("CopyToLocalPackages")
-    // .IsDependentOn("Test")
+    .IsDependentOn("Test")
     .IsDependentOn("PackSashimi")
     .WithCriteria(BuildSystem.IsLocalBuild)
     .Does(() =>
