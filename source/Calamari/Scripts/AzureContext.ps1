@@ -61,11 +61,15 @@ function Execute-WithRetry([ScriptBlock] $command) {
 }
 
 function Get-AzureRmModuleInstalled {
-    return Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue
+    return $null -ne (Get-Command "Login-AzureRmAccount" -ErrorAction SilentlyContinue)
 }
 
 function Get-AzModuleInstalled {
-    return Get-InstalledModule Az -ErrorAction SilentlyContinue
+    return $null -ne (Get-Command "Connect-AzAccount" -ErrorAction SilentlyContinue)
+}
+
+function Get-RunningInPowershellCore {
+    return $PSVersionTable.PSVersion.Major -gt 5
 }
 
 Execute-WithRetry{
@@ -76,21 +80,25 @@ Execute-WithRetry{
             $securePassword = ConvertTo-SecureString $OctopusAzureADPassword -AsPlainText -Force
             $creds = New-Object System.Management.Automation.PSCredential ($OctopusAzureADClientId, $securePassword)
 
-            $runningInPowershellCore = $PSVersionTable.PSVersion.Major -gt 5
+            $runningInPowershellCore = Get-RunningInPowershellCore
+            $azModuleInstalled = Get-AzModuleInstalled
+            $azureRmModuleInstalled = Get-AzureRmModuleInstalled
+
+            Write-Verbose "Azure Powershell environment - Powershell Core: $runningInPowershellCore, Az Module: $azModuleInstalled, AzureRM Module: $azureRmModuleInstalled"
             
-            if ($runningInPowershellCore -and (Get-AzureRmModuleInstalled))
+            if ($runningInPowershellCore -and $azureRmModuleInstalled)
             {
                 # AzureRM is not supported on powershell core
                 Write-Warning "AzureRM module is not compatible with Powershell Core, authentication will not be performed with AzureRM"
             }
 
-            if ((Get-AzureRmModuleInstalled) -and (Get-AzModuleInstalled))
+            if ($azureRmModuleInstalled -and $azModuleInstalled) 
             {
-                # Az and AzureRM modules being installed together is not supported by Microsoft and might cause issues
-                Write-Warning "Installing both AzureRM and Az modules is not recommended and may cause unexpected behaviour: https://g.octopushq.com/AzureTools"
+                # AzureRM and Az modules being installed at the same time is not supported by Microsoft
+                Write-Warning "Installing both AzureRM and Az modules at the same time is not supported and may cause unexpected errors: https://g.octopushq.com/AzureTools"
             }
             
-            if (!$runningInPowershellCore -and (Get-AzureRmModuleInstalled))
+            if (!$runningInPowershellCore -and $azureRmModuleInstalled)
             {
                 # Turn off context autosave, as this will make all authentication occur in memory, and isolate each session from the context changes in other sessions
                 Disable-AzureRMContextAutosave -Scope Process
@@ -109,7 +117,7 @@ Execute-WithRetry{
                 Login-AzureRmAccount -Credential $creds -TenantId $OctopusAzureADTenantId -SubscriptionId $OctopusAzureSubscriptionId -Environment $AzureEnvironment -ServicePrincipal
                 Write-Host "##octopus[stdout-default]"
             }
-            elseif (Get-AzModuleInstalled)
+            elseif ($azModuleInstalled)
             {
                 if (-Not(Get-Command "Disable-AzureRMContextAutosave" -errorAction SilentlyContinue))
                 {
