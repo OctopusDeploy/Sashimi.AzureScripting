@@ -87,7 +87,7 @@ function Initialize-AzureRmContext {
     if (!$AzureEnvironment)
     {
         Write-Error "No Azure environment could be matched given the name $OctopusAzureEnvironment"
-        exit -2
+        exit 2
     }
 
     Write-Verbose "AzureRM Modules: Authenticating with Service Principal"
@@ -122,7 +122,7 @@ function Initialize-AzContext {
     if (!$AzureEnvironment)
     {
         Write-Error "No Azure environment could be matched given the name $OctopusAzureEnvironment"
-        exit -2
+        exit 2
     }
 
     Write-Verbose "Az Modules: Authenticating with Service Principal"
@@ -224,7 +224,7 @@ Execute-WithRetry{
             if (!$AzureEnvironment)
             {
                 Write-Error "No Azure environment could be matched given name $OctopusAzureEnvironment"
-                exit -2
+                exit 2
             }
 
             $azureProfile = New-AzureProfile -SubscriptionId $OctopusAzureSubscriptionId -StorageAccount $OctopusAzureStorageAccountName -Certificate $certificate -Environment $AzureEnvironment
