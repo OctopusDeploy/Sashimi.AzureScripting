@@ -18,7 +18,7 @@ namespace Sashimi.AzureScripting
 
             if (useBundledTooling)
             {
-                taskLog.Warn($"Using the Azure tools bundled with Octopus is not recommended. Learn more about Azure Tools: https://g.octopushq.com/AzureTools.");
+                taskLog.Warn($"Using the Azure tools bundled with Octopus Deploy is not recommended. Learn more about Azure Tools at https://g.octopushq.com/AzureTools.");
             }
 
             return builder.WithAzureCmdlets(context, taskLog).WithAzureCLI(context, taskLog);
