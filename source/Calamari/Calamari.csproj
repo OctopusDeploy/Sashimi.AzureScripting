@@ -20,4 +20,8 @@
     <ItemGroup>
         <EmbeddedResource Include="Scripts\*" />
     </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+        <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
+        <PackageReference Include="System.Security.Principal.Windows" Version="4.7.0" />
+    </ItemGroup>
 </Project>
