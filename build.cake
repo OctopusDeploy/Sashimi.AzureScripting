@@ -95,8 +95,26 @@ Task("Test")
         });
     });
 
+Task("CopyGlobalJsonToTestProjects")
+    .IsDependentOn("Build")
+    .Does(() => {
+        var testProjects = GetFiles("./source/**/*Tests.csproj");
+
+        foreach (var testProject in testProjects)
+        {
+            var frameworks = XmlPeek(testProject, "Project/PropertyGroup/TargetFrameworks") ??
+                XmlPeek(testProject, "Project/PropertyGroup/TargetFramework");
+
+            foreach (var framework in frameworks.Split(';'))
+            {
+                CopyFiles("./global.json", $"{testProject.GetDirectory()}/bin/{configuration}/{framework}");
+            }
+        }
+    });
+
 Task("PublishCalamariProjects")
-   .IsDependentOn("Build")
+    .IsDependentOn("Build")
+    .IsDependentOn("CopyGlobalJsonToTestProjects")
     .Does(() => {
         var projects = GetFiles("./source/**/Calamari*.csproj"); //We need Calamari & Calamari.Tests
 		foreach(var project in projects)
@@ -109,7 +127,7 @@ Task("PublishCalamariProjects")
             foreach(var framework in frameworks.Split(';'))
             {
                 void RunPublish(string runtime, string platform) {
-                     DotNetCorePublish(project.FullPath, new DotNetCorePublishSettings
+                    DotNetCorePublish(project.FullPath, new DotNetCorePublishSettings
 		    	    {
 		    	    	Configuration = configuration,
                         OutputDirectory = $"{publishDir}/{calamariFlavour}/{platform}",
@@ -136,6 +154,7 @@ Task("PublishCalamariProjects")
 
 Task("PublishSashimiTestProjects")
     .IsDependentOn("Build")
+    .IsDependentOn("CopyGlobalJsonToTestProjects")
     .Does(() => {
         var projects = GetFiles("./source/**/Sashimi.Tests.csproj");
 		foreach(var project in projects)
