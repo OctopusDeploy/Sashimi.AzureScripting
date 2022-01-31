@@ -95,26 +95,8 @@ Task("Test")
         });
     });
 
-Task("CopyGlobalJsonToTestProjects")
-    .IsDependentOn("Build")
-    .Does(() => {
-        var testProjects = GetFiles("./source/**/*Tests.csproj");
-
-        foreach (var testProject in testProjects)
-        {
-            var frameworks = XmlPeek(testProject, "Project/PropertyGroup/TargetFrameworks") ??
-                XmlPeek(testProject, "Project/PropertyGroup/TargetFramework");
-
-            foreach (var framework in frameworks.Split(';'))
-            {
-                CopyFiles("./global.json", $"{testProject.GetDirectory()}/bin/{configuration}/{framework}");
-            }
-        }
-    });
-
 Task("PublishCalamariProjects")
     .IsDependentOn("Build")
-    .IsDependentOn("CopyGlobalJsonToTestProjects")
     .Does(() => {
         var projects = GetFiles("./source/**/Calamari*.csproj"); //We need Calamari & Calamari.Tests
 		foreach(var project in projects)
@@ -134,6 +116,8 @@ Task("PublishCalamariProjects")
                         Framework = framework,
                         Runtime = runtime
 		    	    });
+
+                    CopyFiles("./global.json", $"{publishDir}/{calamariFlavour}/{platform}");
                 }
 
                 if(framework.Equals("net5.0"))
@@ -154,7 +138,6 @@ Task("PublishCalamariProjects")
 
 Task("PublishSashimiTestProjects")
     .IsDependentOn("Build")
-    .IsDependentOn("CopyGlobalJsonToTestProjects")
     .Does(() => {
         var projects = GetFiles("./source/**/Sashimi.Tests.csproj");
 		foreach(var project in projects)
@@ -167,6 +150,8 @@ Task("PublishSashimiTestProjects")
 		    	    	Configuration = configuration,
                         OutputDirectory = $"{publishDir}/{sashimiFlavour}"
 		    	    });
+
+                    CopyFiles("./global.json", $"{publishDir}/{sashimiFlavour}");
                 }
 
                 RunPublish();
