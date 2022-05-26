@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Octopus.Server.Extensibility.HostServices.Diagnostics;
 using Sashimi.Server.Contracts;
+using Sashimi.Server.Contracts.Accounts;
 using Sashimi.Server.Contracts.ActionHandlers;
 
 namespace Sashimi.AzureScripting
@@ -16,6 +18,7 @@ namespace Sashimi.AzureScripting
         public bool CanRunOnDeploymentTarget => false;
         public ActionHandlerCategory[] Categories => new[] { ActionHandlerCategory.BuiltInStep, AzureConstants.AzureActionHandlerCategory, ActionHandlerCategory.Script };
         public string[] StepBasedVariableNameForAccountIds { get; } = { SpecialVariables.Action.Azure.AccountId };
+        IEnumerable<AccountType> SupportedAccountTypes => new[] { Sashimi.Azure.Accounts.AccountTypes.AzureServicePrincipalAccountType };
 
         public IActionHandlerResult Execute(IActionHandlerContext context, ITaskLog taskLog)
         {
