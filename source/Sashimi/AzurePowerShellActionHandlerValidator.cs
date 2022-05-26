@@ -8,6 +8,7 @@ namespace Sashimi.AzureScripting
     {
         public AzurePowerShellActionHandlerValidator()
         {
+            // TODO: Don't want this rule to run when cloud connections are configured
             When(a => a.ActionType == SpecialVariables.Action.Azure.ActionTypeName,
                  () =>
                  {
