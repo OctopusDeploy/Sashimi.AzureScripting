@@ -104,11 +104,11 @@ namespace Calamari.AzureScripting
 
         private class AzureCloudConnectionAuthentication
         {
-            public ServicePrincipalAccount Account { get; set; }
+            public ServicePrincipalAccount AccountDetails { get; set; }
 
-            public AzureCloudConnectionAuthentication(ServicePrincipalAccount account)
+            public AzureCloudConnectionAuthentication(ServicePrincipalAccount accountDetails)
             {
-                Account = account;
+                AccountDetails = accountDetails;
             }
         }
 
@@ -153,11 +153,11 @@ namespace Calamari.AzureScripting
             public static AzureContextScriptWrapperAuthentication CreateFromCloudConnectionContext(CloudConnectionContext<AzureCloudConnectionAuthentication> context)
             {
                 return new AzureContextScriptWrapperAuthentication(
-                    context.Authentication.Account.SubscriptionNumber,
-                    context.Authentication.Account.AzureEnvironment ?? DefaultAzureEnvironment,
-                    context.Authentication.Account.ClientId,
-                    context.Authentication.Account.TenantId,
-                    context.Authentication.Account.Password,
+                    context.Authentication.AccountDetails.SubscriptionNumber,
+                    context.Authentication.AccountDetails.AzureEnvironment ?? DefaultAzureEnvironment,
+                    context.Authentication.AccountDetails.ClientId,
+                    context.Authentication.AccountDetails.TenantId,
+                    context.Authentication.AccountDetails.Password,
                     null,
                     null, 
                     null,
