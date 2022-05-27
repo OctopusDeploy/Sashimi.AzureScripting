@@ -154,7 +154,7 @@ namespace Calamari.AzureScripting
             {
                 return new AzureContextScriptWrapperAuthentication(
                     context.Authentication.AccountDetails.SubscriptionNumber,
-                    context.Authentication.AccountDetails.AzureEnvironment ?? DefaultAzureEnvironment,
+                    !string.IsNullOrEmpty(context.Authentication.AccountDetails.AzureEnvironment) ? context.Authentication.AccountDetails.AzureEnvironment! : DefaultAzureEnvironment,
                     context.Authentication.AccountDetails.ClientId,
                     context.Authentication.AccountDetails.TenantId,
                     context.Authentication.AccountDetails.Password,
