@@ -154,7 +154,7 @@ namespace Calamari.AzureScripting
             {
                 return new AzureContextScriptWrapperAuthentication(
                     context.Authentication.Account.SubscriptionNumber,
-                    context.Authentication.Account.AzureEnvironment,
+                    context.Authentication.Account.AzureEnvironment ?? DefaultAzureEnvironment,
                     context.Authentication.Account.ClientId,
                     context.Authentication.Account.TenantId,
                     context.Authentication.Account.Password,
@@ -182,7 +182,7 @@ namespace Calamari.AzureScripting
                 string clientId,
                 string tenantId,
                 string password,
-                string azureEnvironment)
+                string? azureEnvironment)
             {
                 SubscriptionNumber = subscriptionNumber;
                 ClientId = clientId;
@@ -195,7 +195,7 @@ namespace Calamari.AzureScripting
             public string ClientId { get; }
             public string TenantId { get; }
             public string Password { get; }
-            public string AzureEnvironment { get; }
+            public string? AzureEnvironment { get; }
         }
 
         private CloudConnectionContext<AzureCloudConnectionAuthentication>? GetCloudConnectionContext(IVariables variables)
