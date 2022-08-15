@@ -71,6 +71,28 @@ az group list";
 
         [Test]
         [RequiresPowerShell5OrAbove]
+        public void ExecuteAnInlinePowerShellCoreScriptWithCloudConnection()
+        {
+            var psScript = @"
+$ErrorActionPreference = 'Continue'
+az --version
+Get-AzureEnvironment
+az group list";
+
+            ActionHandlerTestBuilder.CreateAsync<AzurePowerShellActionHandler, Program>()
+                                    .WithArrange(context =>
+                                    {
+                                        AddCloudConnection(context);
+                                        context.Variables.Add(Calamari.Common.Plumbing.Variables.PowerShellVariables.Edition, "Core");
+                                        context.Variables.Add(KnownVariables.Action.Script.ScriptSource, KnownVariableValues.Action.Script.ScriptSource.Inline);
+                                        context.Variables.Add(KnownVariables.Action.Script.Syntax, ScriptSyntax.PowerShell.ToString());
+                                        context.Variables.Add(KnownVariables.Action.Script.ScriptBody, psScript);
+                                    })
+                                    .Execute();
+        }
+
+        [Test]
+        [RequiresPowerShell5OrAbove]
         public void ExecuteAnInlinePowerShellCoreScriptAgainstAnInvalidAzureEnvironment()
         {
             var psScript = @"
@@ -99,6 +121,20 @@ az group list";
             context.Variables.Add("Octopus.Action.Azure.TenantId", tenantId);
             context.Variables.Add("Octopus.Action.Azure.ClientId", clientId);
             context.Variables.Add("Octopus.Action.Azure.Password", clientSecret);
+        }
+
+        void AddCloudConnection(TestActionHandlerContext<Program> context)
+        {
+            context.Variables.Add("Octopus.CloudConnection.Context", @$"{{
+    ""authentication"": {{
+        ""account"": {{
+            ""subscriptionNumber"": ""{subscriptionId}"",
+            ""tenantId"": ""{tenantId}"",
+            ""clientId"": ""{clientId}"",
+            ""password"": ""{clientSecret}""
+        }}
+    }}    
+}}");
         }
     }
 }
